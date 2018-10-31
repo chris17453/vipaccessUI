@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+pylint = "<2.0.0"
 
 [packages]
 pip = "==18"
+"python-vipaccess2" = "*"
 
 [requires]
 python_version = "2.7"

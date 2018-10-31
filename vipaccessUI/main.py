@@ -6,10 +6,13 @@
 
 """
 
-from tkinter import Tk, Canvas, Frame, BOTH
+from Tkinter import Tk, Canvas, Frame, BOTH
 import subprocess 
-import tkinter
+import Tkinter
 import time
+import vipaccess2.cli
+import cStringIO
+import sys
 
 
 class VipAccessUI(Frame):
@@ -17,8 +20,9 @@ class VipAccessUI(Frame):
     pulled=False
     last_pull=time.time()
           
-    def __init__(self):
-        super().__init__()   
+    def __init__(self,master=None):
+        Frame.__init__(self, master)
+
         self.initUI()
         
 
@@ -35,16 +39,22 @@ class VipAccessUI(Frame):
     def copy_text_to_clipboard(self,event):
         self.set_copy_ui()
         self.master.after(500, self.clear_copy_ui)
-        copied=True
         field_value =self.get_token()
         self.master.clipboard_clear()  
         self.master.clipboard_append(field_value)  
 
 
     def get_token(self):
-        result = subprocess.run(['vipaccess',], stdout=subprocess.PIPE)
-        access_key=result.stdout
+        stream = cStringIO.StringIO()
+        sys.stdout = stream
+        vipaccess2.cli.main()
+        access_key= stream.getvalue()
+        sys.stdout = sys.__stdout__
         return access_key.rstrip()
+
+    def get_master_token(self):
+        token=vipaccess2.cli.show_master_token()
+        return token.rstrip()
 
 
     def task(self):
@@ -56,18 +66,22 @@ class VipAccessUI(Frame):
             if diff>5:
                 self.pulled=False
         
-        percent_done=now/30
+        percent_done=float(now)/30
         half_width=int(width/2)
-        percent_in_pixels=int(percent_done*half_width)
+        percent_in_pixels=float(percent_done*half_width)
         x1=half_width-percent_in_pixels
         x2=half_width+percent_in_pixels
         self.canvas.coords(self.percentage,x1, 0, x2   , 10)
+
         if False== self.pulled:
             self.lbl['text']=self.get_token()
             self.pulled=True
             self.last_pull=time.time()
         
-        self.seconds['text']= "{} Seconds left".format(now)
+        seconds_left_text="{} Seconds left".format(now)
+        if self.seconds['text']!=seconds_left_text:
+            self.seconds['text']=seconds_left_text
+            
         self.master.after(100, self.task)  # reschedule event in 2 seconds
 
 
@@ -78,30 +92,38 @@ class VipAccessUI(Frame):
         self.master.title("VIP - Access Token")
         self.pack(fill=BOTH, expand=1)
         self.configure(background='black')
-
-        self.lbl = tkinter.Label(self, text="",font=("MONO", 24),fg="WHITE",background="black", height=2, width=10)
-        self.lbl.pack()
-        self.lbl.bind("<Button-1>", self.copy_text_to_clipboard)  
+        master_token=self.get_master_token()
+        self.cred_lbl = Tkinter.Label(self, text="Credential ID:",font=("MONO", 14),fg="WHITE",background="black", height=1)
+        self.cred_lbl.pack()
+        
+        self.master_token = Tkinter.Label(self, text=master_token,font=("MONO", 24),fg="LIGHTBLUE",background="black", height=1)
+        self.master_token.pack()
+        
 
         self.canvas = Canvas(self,width=250,height=10,bg='black',bd=0, highlightthickness=0, relief='ridge')
         self.percentage=self.canvas.create_rectangle(0, 0, 0   , 10, outline="black", fill="orange")
         self.canvas.pack()
 
-        self.seconds = tkinter.Label(self, text="",fg="WHITE",background="black",font=("MONO", 14))
+        self.lbl = Tkinter.Label(self, text="",font=("MONO", 24),fg="WHITE",background="black", height=1)
+        self.lbl.pack()
+        self.lbl.bind("<Button-1>", self.copy_text_to_clipboard)  
+
+        self.seconds = Tkinter.Label(self, text="",fg="WHITE",background="black",font=("MONO", 14))
         self.seconds.pack()
 
         self.master.after(200, self.task)
-        self.master.bind("<Q>", lambda e: self.master.destroy())
+        # TODO get correct key bind. its not <Q>
+        #self.master.bind("<Q>", lambda e: self.master.destroy())
 
 
 
 
 def main():
   
-    window = tkinter.Tk()
-    window.geometry("250x120")
-    ex = VipAccessUI()
+    window = Tkinter.Tk()
     window.resizable(0, 0) #Don't allow resizing in the x or y direction
+    window.geometry("250x160")
+    VipAccessUI()
     window.mainloop()
 
 

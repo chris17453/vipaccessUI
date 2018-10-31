@@ -14,6 +14,10 @@ pip install --user vipaccessUI
 ```
 vipaccess provision -t VSMT
 ```
+- This will give you something like
+```
+VSMT12345678
+```
 
 ## Setp 2 - Register the token
 - The keys are NOT valid unless the provisioned token is registered successfully

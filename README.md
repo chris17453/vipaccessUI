@@ -8,15 +8,16 @@ pip install --user vipaccessUI
 ```
 
 ## Step 1 - Create a Token
-- there are multiple types of token types. USe the one correct for your need.
-- the are many token types (VSMT,VSST,SYMZ) refer here for more info ![Token Types] (https://support.symantec.com/en_US/article.TECH239895.html)
+- There are multiple types of token types, your company may only allow a certain type.
+- The most common types are  (VSMT,VSST,SYMZ)
+- More info about types->  https://support.symantec.com/en_US/article.TECH239895.html 
 ```
 vipaccess provision -t VSMT
 ```
 
 ## Setp 2 - Register the token
-- The keys are NOT valid unless the pprovisioned token is registered successfully.
-- Ask your IT department, HR, or security if you do not know where to register the provisoned token. 
+- The keys are NOT valid unless the provisioned token is registered successfully
+- Ask your IT department, HR, or security if you do not know where to register the provisoned token
 
 
 ## Step 3 - Run

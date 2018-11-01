@@ -2,6 +2,12 @@
 A python-tkinter frontend for the python module python-vipaccess2. Which itself is a customized fork of a fork of a fork. At its core it is a TOPF implimentation. The same as the symanmtec VIP Access Token.
 
 
+## OS
+- Fedora... YES! This installs the python package and gnome menu item (vipaccessUI)
+- Windows.. Not sure. Likely wroks from the CLI
+- OSX... Likely from the comandline
+
+
 ## Install
 ```
 pip install --user vipaccessUI
